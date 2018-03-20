@@ -4,12 +4,12 @@ import cv2
 import argparse
 
 # Config for the line coordinates and size of the line
-X = 450
-Y = 550
+X = 650
+Y = 425
 SIZE =  100
 
-X_2 = 150
-Y_2 = 550
+X_2 = 750
+Y_2 = 300
 SIZE_2 = 100
 
 def get_data(INPUT, OUTPUT):
@@ -21,24 +21,22 @@ def get_data(INPUT, OUTPUT):
         ret, frame = cap.read()
         if ret:
             gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-            current_time = cap.get(cv2.CAP_PROP_POS_MSEC)/1000
+            frame_num = cap.get(cv2.CAP_PROP_POS_FRAMES)
+            # fps = cap.get(cv2.CAP_PROP_FPS)
+            # convert_frame = str(int(current_frame/fps)) + ":" + str(int(current_frame%30))
 
             total = 0
             for value in range(0, SIZE+1): # 1st line
-                total += gray[Y + value, X] #row major order in opencv
+                total += gray[Y+value, X] #row major order in opencv
             for value_2 in range(0, SIZE_2+1): # 2nd line
-                total += gray[Y_2 + value_2, X_2]
-            df.loc[current_time] = [total]
+                total += gray[Y_2+value_2, X_2]
+            df.loc[frame_num] = [total]
 
             # Draw corresponding line from ((X, Y), (X, Y + SIZE))
-            cv2.line(gray, (X, Y), (X, Y + SIZE),(255,255,255),1)
-            cv2.line(gray, (X_2, Y_2), (X_2, Y_2 + SIZE_2),(255,255,255),1)
+            cv2.line(gray, (X, Y), (X, Y+SIZE),(255,255,255),1)
+            cv2.line(gray, (X_2, Y_2), (X_2, Y_2+SIZE_2),(255,255,255),1)
             cv2.imshow('frame',gray)
             print(df.tail())
-
-            # Frame rate
-            # fps = cap.get(cv2.CAP_PROP_FPS)
-            # print("Frames per second using video.get(cv2.CAP_PROP_FPS) : {0}".format(fps))
 
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 break

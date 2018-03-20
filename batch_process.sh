@@ -1,6 +1,7 @@
 #!/bin/bash
-BASE="/Users/agoraqa/Desktop/videos/iOS/test2"
+BASE="/Users/agoraqa/Desktop/videos/iOS/test3_blackmagic"
 FILES="${BASE}/*.mov"
+
 for f in $FILES
 do
   dname=${f%.mov}.csv

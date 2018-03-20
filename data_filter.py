@@ -3,8 +3,6 @@ import numpy as np
 import argparse
 from tqdm import tqdm
 
-THRESHOLD = 11 # lag for more than 11 frames
-
 # Return a list of index of continuously repeated 0
 def zero_runs(a):
     # Create an array that is 1 where a is 0, and pad each end with an extra 0.
@@ -14,7 +12,7 @@ def zero_runs(a):
     ranges = np.where(absdiff == 1)[0].reshape(-1, 2)
     return ranges
 
-def clean_data(INPUT, OUTPUT):
+def clean_data(INPUT, OUTPUT, THRESHOLD):
     # Loading data and calculate the difference of TOTAL_PIX_VALUE between rows
     df = pd.read_csv(INPUT[0])
     df['PIX_VALUE_DIFF'] = df['TOTAL_PIX_VALUE'].diff()
@@ -46,8 +44,11 @@ if __name__ == "__main__":
 
     input_file = args.input
     output_file = args.output if args.output is not None else 'result.csv'
-    THRESHOLD = args.threshold if args.threshold is not None else 11
-    clean_data(input_file, output_file)
+    threshold = args.threshold if args.threshold is not None else 7
+
+    clean_data(input_file, output_file, threshold)
+
+    print(df_result)
     done = """\
                      ,----..            ,--.
         ,---,       /   /   \         ,--.'|    ,---,.
@@ -59,7 +60,7 @@ if __name__ == "__main__":
     '   | ;  .  |.   |  ' ' ' :'   ' ;.    ;|   :   .'
     |   | :  |  ''   ;  \; /  ||   | | \   ||   |  |-,
     '   : | /  ;  \   \  ',  / '   : |  ; .''   :  ;/|
-    |   | '` ,/    ;   :    /  |   | '`--'  |   |    \\
+    |   | '` ,/    ;   :    /  |   | '`--'  |   |    |
     ;   :  .'       \   \ .'   '   : |      |   :   .'
     |   ,.'          `---`     ;   |.'      |   | ,'
     '---'                      '---'        `----'
