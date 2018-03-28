@@ -4,10 +4,10 @@ import cv2
 import argparse
 
 N = 100 # Number of sampling points
-X_MIN = 500 # Coordinates for sampling area
-X_MAX = 800
-Y_MIN = 350
-Y_MAX = 600
+X_MIN = 550 # Coordinates for sampling area
+X_MAX = 750
+Y_MIN = 250
+Y_MAX = 500
 SEED = 1234 # Initialize random state
 
 def gaussian_filter():

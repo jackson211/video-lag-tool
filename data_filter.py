@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 import argparse
 from tqdm import tqdm
+import os
 
 # Return a list of index of continuously repeated 0
 def zero_runs(a):
@@ -12,43 +13,42 @@ def zero_runs(a):
     ranges = np.where(absdiff == 1)[0].reshape(-1, 2)
     return ranges
 
-def clean_data(INPUT, OUTPUT, THRESHOLD):
+def clean_data(INPUT, THRESHOLD):
     # Loading data and calculate the difference of TOTAL_PIX_VALUE between rows
-    df = pd.read_csv(INPUT[0])
-    df['PIX_VALUE_DIFF'] = df['TOTAL_PIX_VALUE'].diff()
-    df.loc[(df['PIX_VALUE_DIFF'] <= 100) & (df['PIX_VALUE_DIFF'] >= -100), 'PIX_VALUE_DIFF'] = 0 # Filtering out difference value <=100 and >=-100
-    df = df.fillna(0)
+    for file in INPUT:
+        df = pd.read_csv(file)
+        dir = os.path.dirname(file.name)
+        filename, extension = os.path.basename(file.name).split('.')
 
-    # Filtering lagging frame more than certain number
-    time_period = zero_runs(df['PIX_VALUE_DIFF'].tolist())-1
-    time_period[0, :1] = 0
-    filtered_time_period = time_period[np.where(np.diff(time_period)+1 >= THRESHOLD)[0]]
+        clean_dir = dir + '/clean'
+        result_dir = dir + '/result'
+        clean_file = filename + '-clean.' + extension
+        result_file = filename + '-result.' + extension
 
-    #Output result dataframe
-    result = pd.DataFrame(columns=['START_TIME', 'END_TIME', 'TIME_PERIOD'])
-    for i in range(0, len(filtered_time_period)):
-        start_time = df.iloc[filtered_time_period[i][0]]['TIME']
-        end_time = df.iloc[filtered_time_period[i][1]]['TIME']
-        time_diff = end_time - start_time
-        result = result.append({'START_TIME': start_time, 'END_TIME': end_time, 'TIME_PERIOD': time_diff}, ignore_index=True)
+        if not os.path.exists(clean_dir):
+            os.makedirs(clean_dir)
+        if not os.path.exists(result_dir):
+            os.makedirs(result_dir)
 
-    return result.to_csv(OUTPUT)
+        df.loc[(df['PIX_VALUE_DIFF'] <= 100) & (df['PIX_VALUE_DIFF'] >= -100), 'PIX_VALUE_DIFF'] = 0 # Filtering out difference value <=100 and >=-100
+        df.to_csv(os.path.join(clean_dir, clean_file))
 
+        # Filtering lagging frame more than certain number
+        time_period = zero_runs(df['PIX_VALUE_DIFF'].tolist())-1
+        time_period[0, :1] = 0
+        filtered_time_period = time_period[np.where(np.diff(time_period)+1 > THRESHOLD)[0]]
 
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
-    parser.add_argument('-i', '--input', nargs=1, type=argparse.FileType('r'), help="Directory of input file.")
-    parser.add_argument('-o', '--output', nargs='?', type=argparse.FileType('w'), help="Directory of output file.")
-    parser.add_argument('-n', '--threshold', nargs='?', type=int, help="Threshold value that set number of frames need to be filtered out. Default value: 7.")
-    args = parser.parse_args()
+        #Output result dataframe
+        result = pd.DataFrame(columns=['START_FRAME', 'END_FRAME', 'FRAME_PERIOD'])
 
-    input_file = args.input
-    output_file = args.output if args.output is not None else 'result.csv'
-    threshold = args.threshold if args.threshold is not None else 7
+        for i in range(0, len(filtered_time_period)):
+            start_frame = df.iloc[filtered_time_period[i][0]]['FRAME']
+            end_frame = df.iloc[filtered_time_period[i][1]]['FRAME']
+            frame_diff = end_frame - start_frame + 1
+            result = result.append({'START_FRAME': start_frame, 'END_FRAME': end_frame, 'FRAME_PERIOD': frame_diff}, ignore_index=True)
 
-    clean_data(input_file, output_file, threshold)
-
-    print(df_result)
+        print(result)
+        result.to_csv(os.path.join(result_dir, result_file))
     done = """\
                      ,----..            ,--.
         ,---,       /   /   \         ,--.'|    ,---,.
@@ -65,4 +65,17 @@ if __name__ == "__main__":
     |   ,.'          `---`     ;   |.'      |   | ,'
     '---'                      '---'        `----'
     """
-    print(done)
+    return done
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-i', '--input', nargs='*', type=argparse.FileType('r'), help="Directory of input file.")
+    parser.add_argument('-n', '--threshold', nargs='?', type=int, help="Threshold value that set number of frames need to be filtered out. Default value: 7.")
+    args = parser.parse_args()
+
+    input_file = args.input
+    # output_file = args.output if args.output is not None else 'result.csv'
+    threshold = args.threshold if args.threshold is not None else 6
+
+    print(clean_data(input_file, threshold))
