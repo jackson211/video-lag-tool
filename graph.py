@@ -1,21 +1,14 @@
 import numpy as np
 import pandas as pd
 import os
+import argparse
 from bokeh.layouts import layout
 from bokeh.models import HoverTool, TapTool, CustomJS, Slider, ColumnDataSource, WidgetBox
 from bokeh.plotting import figure, output_file, show
-
-output_file('compare.html')
-
-BASE_DIR = "/Users/agoraqa/Desktop/videos/iOS/test3_blackmagic/point/"
-loss10_1 = "loss10_1_point"
-loss10_2 = "loss10_2_point"
-loss20_1 = "loss20_1_point"
-loss20_2 = "loss20_2_point"
-suffix = ".csv"
+from bokeh.models.glyphs import Text
 
 def figure_plot(f_name, fx_range=None, fy_range=None):
-    df = pd.read_csv(BASE_DIR+f_name+suffix)
+    df = pd.read_csv(f_name)
 
     source = ColumnDataSource(data=dict(
         x = df['FRAME'],
@@ -59,25 +52,29 @@ def figure_plot(f_name, fx_range=None, fy_range=None):
         source_2.change.emit();
     """)
 
-    threshold_slider = Slider(start=0, end=100, value=0, step=1, title="Threshold", callback=callback, callback_policy='mouseup')
+    threshold_slider = Slider(start=0, end=100, value=0, step=1, title="Threshold", callback=callback, callback_policy='throttle')
     callback.args["thres"] = threshold_slider
     widgets = WidgetBox(threshold_slider)
     return widgets, p, p.x_range, p.y_range
 
-w1, f1, f1_x_range, f1_y_range = figure_plot(loss10_1)
-w2, f2, f2_x_range, f2_y_range = figure_plot(loss10_2, f1_x_range, f1_y_range)
-w3, f3, f3_x_range, f3_y_range = figure_plot(loss20_1, f1_x_range, f1_y_range)
-w4, f4, f4_x_range, f4_y_range = figure_plot(loss20_2, f1_x_range, f1_y_range)
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-i', '--input', nargs='*', type=argparse.FileType('r'), help="Directory of input file.")
+    args = parser.parse_args()
 
-l = layout([
-    w1,
-    f1,
-    w2,
-    f2,
-    w3,
-    f3,
-    w4,
-    f4,
-], sizing_mode='scale_width')
+    input_files = args.input
+    x_r=y_r = 0
+    plots = []
+    for i, file in enumerate(input_files):
+        if i == 0:
+            w, f, x_r, y_r = figure_plot(file.name)
+            DATA_DIR = os.path.dirname(file.name)
+            DATA_NAME = file.name.split('/')[-2]
+        else:
+            w, f, _x_r, _y_r = figure_plot(file.name, x_r, y_r)
+        plots.extend((w,f))
 
-show(l)
+    output_file(os.path.join(DATA_DIR, DATA_NAME+'_compare.html'), title=DATA_NAME)
+    l = layout(plots, sizing_mode='scale_width')
+
+    show(l)

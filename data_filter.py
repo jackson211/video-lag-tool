@@ -75,7 +75,6 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     input_file = args.input
-    # output_file = args.output if args.output is not None else 'result.csv'
     threshold = args.threshold if args.threshold is not None else 6
 
     print(clean_data(input_file, threshold))
