@@ -1,8 +1,10 @@
 import pandas as pd
 import numpy as np
 import argparse
-from tqdm import tqdm
 import os
+from graph import run
+
+PIX_ERROR = 1000
 
 # Return a list of index of continuously repeated 0
 def zero_runs(a):
@@ -30,7 +32,7 @@ def clean_data(INPUT, THRESHOLD):
         if not os.path.exists(result_dir):
             os.makedirs(result_dir)
 
-        df.loc[(df['PIX_VALUE_DIFF'] <= 100) & (df['PIX_VALUE_DIFF'] >= -100), 'PIX_VALUE_DIFF'] = 0 # Filtering out difference value <=100 and >=-100
+        df.loc[(df['PIX_VALUE_DIFF'] <= PIX_ERROR) & (df['PIX_VALUE_DIFF'] >= -PIX_ERROR), 'PIX_VALUE_DIFF'] = 0 # Filtering out difference value <=100 and >=-100
         df.to_csv(os.path.join(clean_dir, clean_file))
 
         # Filtering lagging frame more than certain number
@@ -74,7 +76,8 @@ if __name__ == "__main__":
     parser.add_argument('-n', '--threshold', nargs='?', type=int, help="Threshold value that set number of frames need to be filtered out. Default value: 7.")
     args = parser.parse_args()
 
-    input_file = args.input
+    input_files = args.input
     threshold = args.threshold if args.threshold is not None else 6
 
-    print(clean_data(input_file, threshold))
+    print(clean_data(input_files, threshold))
+    run(input_files)

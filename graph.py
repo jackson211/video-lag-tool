@@ -11,12 +11,12 @@ def figure_plot(f_name, fx_range=None, fy_range=None):
     df = pd.read_csv(f_name)
 
     source = ColumnDataSource(data=dict(
-        x = df['FRAME'],
+        x = df.index.tolist(),
         y = df['PIX_VALUE_DIFF'],
     ))
 
     source_2 = ColumnDataSource(data=dict(
-        x = df['FRAME'],
+        x = df.index.tolist(),
         y = df['PIX_VALUE_DIFF'],
     ))
 
@@ -52,18 +52,18 @@ def figure_plot(f_name, fx_range=None, fy_range=None):
         source_2.change.emit();
     """)
 
-    threshold_slider = Slider(start=0, end=100, value=0, step=1, title="Threshold", callback=callback, callback_policy='throttle')
+    threshold_slider = Slider(start=0, end=1000, value=0, step=10, title="Threshold", callback=callback, callback_policy='throttle')
     callback.args["thres"] = threshold_slider
     widgets = WidgetBox(threshold_slider)
     return widgets, p, p.x_range, p.y_range
 
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
-    parser.add_argument('-i', '--input', nargs='*', type=argparse.FileType('r'), help="Directory of input file.")
-    args = parser.parse_args()
+def run(input_files):
+    # parser = argparse.ArgumentParser()
+    # parser.add_argument('-i', '--input', nargs='*', type=argparse.FileType('r'), help="Directory of input file.")
+    # args = parser.parse_args()
 
-    input_files = args.input
-    x_r=y_r = 0
+    # input_files = args.input
+    x_r = y_r = 0
     plots = []
     for i, file in enumerate(input_files):
         if i == 0:
