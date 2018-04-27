@@ -32,7 +32,7 @@ def clean_data(INPUT, THRESHOLD):
         if not os.path.exists(result_dir):
             os.makedirs(result_dir)
 
-        df.loc[(df['PIX_VALUE_DIFF'] <= PIX_ERROR) & (df['PIX_VALUE_DIFF'] >= -PIX_ERROR), 'PIX_VALUE_DIFF'] = 0 # Filtering out difference value <=100 and >=-100
+        df.loc[(df['PIX_VALUE_DIFF'] <= PIX_ERROR), 'PIX_VALUE_DIFF'] = 0 # Filtering out difference value <=1000
         df.to_csv(os.path.join(clean_dir, clean_file))
 
         # Filtering lagging frame more than certain number

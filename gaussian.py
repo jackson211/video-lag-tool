@@ -6,10 +6,10 @@ import os
 import math
 
 N = 1000 # Number of sampling points
-X_MIN = 400 # Coordinates for sampling area
-X_MAX = 900
-Y_MIN = 150
-Y_MAX = 650
+X_MIN = 20 # Coordinates for sampling area
+X_MAX = 750
+Y_MIN = 100
+Y_MAX = 700
 SEED = 1020 # Initialize random state
 
 def gaussian_filter():
@@ -22,7 +22,7 @@ def get_pix_value(frame, f):
     pix_value = []
     for n in f:
         pix_value.append(frame[n[1], n[0]])
-    return np.asarray(pix_value, dtype=np.int16)
+    return np.asarray(pix_value, dtype=np.int64)
 
 def read_file(input):
     if isinstance(input, int):
@@ -32,6 +32,7 @@ def read_file(input):
     return cap
 
 def pix_diff(curr, pre):
+    # return sum(np.square(curr-pre, dtype=np.int64))
     return sum((curr-pre)**2)
 
 def get_data(INPUT, OUTPUT, filter):
