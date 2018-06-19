@@ -33,7 +33,7 @@ def figure_plot(f_name, fx_range=None, fy_range=None):
     p.add_tools(hover)
     p.xaxis.axis_label = 'Frame'
     p.yaxis.axis_label = 'Pixel Difference Value'
-    p.grid.grid_line_alpha=0.5
+    p.grid.grid_line_alpha = 0.5
 
     callback = CustomJS(args=dict(source=source, source_2=source_2), code="""
         var d = source.data;
@@ -52,17 +52,12 @@ def figure_plot(f_name, fx_range=None, fy_range=None):
         source_2.change.emit();
     """)
 
-    threshold_slider = Slider(start=0, end=1000, value=0, step=10, title="Threshold", callback=callback, callback_policy='throttle')
+    threshold_slider = Slider(start=0, end=10000, value=0, step=100, title="Threshold", callback=callback, callback_policy='throttle')
     callback.args["thres"] = threshold_slider
     widgets = WidgetBox(threshold_slider)
     return widgets, p, p.x_range, p.y_range
 
 def run(input_files):
-    # parser = argparse.ArgumentParser()
-    # parser.add_argument('-i', '--input', nargs='*', type=argparse.FileType('r'), help="Directory of input file.")
-    # args = parser.parse_args()
-
-    # input_files = args.input
     x_r = y_r = 0
     plots = []
     for i, file in enumerate(input_files):

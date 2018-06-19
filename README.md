@@ -14,6 +14,6 @@ Define your own sampling area(X_MIN, X_MAX, Y_MIN, Y_MAX) in **gaussian.py** Pix
 ## Data filtering
 Usage:
 ```
-python3 data_filter.py -i <input file> -n <optional threshold value>
+<input file> -n <optional threshold value>
 ```
 To filter out lagging start time, end time and time period from raw csv file and save to **result.csv**, cleaned data files, and visualization graph html file . Optional threshold value controls number of frames need to be filtered out, default value: 6.

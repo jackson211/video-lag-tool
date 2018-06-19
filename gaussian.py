@@ -6,10 +6,10 @@ import os
 import math
 
 N = 1000 # Number of sampling points
-X_MIN = 20 # Coordinates for sampling area
-X_MAX = 750
-Y_MIN = 100
-Y_MAX = 700
+X_MIN = 450 # Coordinates for sampling area
+X_MAX = 825
+Y_MIN = 200 
+Y_MAX = 575
 SEED = 1020 # Initialize random state
 
 def gaussian_filter():
@@ -32,14 +32,12 @@ def read_file(input):
     return cap
 
 def pix_diff(curr, pre):
-    # return sum(np.square(curr-pre, dtype=np.int64))
     return sum((curr-pre)**2)
 
 def get_data(INPUT, OUTPUT, filter):
     df = pd.DataFrame(columns=['PIX_VALUE_DIFF'])
     df.index.name = 'FRAME'
 
-    # file_name = INPUT.name
     cap = read_file(INPUT)
     previous_value = None
 

@@ -4,7 +4,7 @@ import argparse
 import os
 from graph import run
 
-PIX_ERROR = 1000
+PIX_ERROR = 10000
 
 # Return a list of index of continuously repeated 0
 def zero_runs(a):
